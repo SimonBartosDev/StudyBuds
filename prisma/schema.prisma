@@ -1,0 +1,66 @@
+// Prisma schema for StudyBuds
+// Social learning platform for university students
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id     String  @id // Matches Clerk User ID
+  email  String  @unique
+  name   String?
+  avatar String?
+
+  enrollments Enrollment[]
+  posts       Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Room {
+  id         String   @id @default(uuid())
+  name       String // e.g. "CS101"
+  university String // e.g. "Aalto University"
+  createdAt  DateTime @default(now())
+
+  members Enrollment[]
+  posts   Post[]
+}
+
+model Enrollment {
+  id     String @id @default(uuid())
+  userId String
+  roomId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, roomId]) // Prevent double joining
+  @@index([userId])
+  @@index([roomId])
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  content   String
+  fileUrl   String? // Optional PDF/Image link
+  fileName  String? // Original filename for display
+  createdAt DateTime @default(now())
+
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([authorId])
+}
