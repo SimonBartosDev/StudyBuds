@@ -4,7 +4,9 @@ import { db } from "@/lib/db";
 import { ensureUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-export async function joinRoom(roomId: string) {
+import { compare } from "bcryptjs";
+
+export async function joinRoom(roomId: string, password?: string) {
     const userId = await ensureUser();
     if (!userId) throw new Error("Unauthorized");
 
@@ -17,6 +19,26 @@ export async function joinRoom(roomId: string) {
 
     if (existing) {
         return { alreadyEnrolled: true };
+    }
+
+    // Check if room is private and verify password
+    const room = await db.room.findUnique({
+        where: { id: roomId },
+    });
+
+    if (!room) {
+        throw new Error("Room not found");
+    }
+
+    if (room.isPrivate) {
+        if (!password) {
+            return { error: "Password required" };
+        }
+
+        const isMatch = room.password ? await compare(password, room.password) : false;
+        if (!isMatch) {
+            return { error: "Invalid password" };
+        }
     }
 
     await db.enrollment.create({

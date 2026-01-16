@@ -9,11 +9,14 @@ export type RoomWithCount = {
     name: string;
     university: string;
     createdAt: Date;
+    isPrivate: boolean;
     _count: {
         members: number;
         posts: number;
     };
 };
+
+import { hash } from "bcryptjs";
 
 export async function createRoom(formData: FormData) {
     const userId = await ensureUser();
@@ -21,15 +24,28 @@ export async function createRoom(formData: FormData) {
 
     const name = formData.get("name") as string;
     const university = formData.get("university") as string;
+    const isPrivate = formData.get("isPrivate") === "on";
+    const password = formData.get("password") as string;
 
     if (!name || !university) {
         throw new Error("Name and university are required");
+    }
+
+    if (isPrivate && !password) {
+        throw new Error("Password is required for private rooms");
+    }
+
+    let hashedPassword = null;
+    if (isPrivate && password) {
+        hashedPassword = await hash(password, 10);
     }
 
     const room = await db.room.create({
         data: {
             name,
             university,
+            isPrivate,
+            password: hashedPassword,
         },
     });
 
@@ -68,7 +84,7 @@ export async function getRooms(search?: string): Promise<RoomWithCount[]> {
         orderBy: { createdAt: "desc" },
     });
 
-    return rooms;
+    return rooms.map(({ password, ...room }) => room as RoomWithCount);
 }
 
 export async function getRoom(roomId: string): Promise<RoomWithCount | null> {
@@ -84,7 +100,9 @@ export async function getRoom(roomId: string): Promise<RoomWithCount | null> {
         },
     });
 
-    return room;
+    if (!room) return null;
+    const { password, ...roomWithoutPassword } = room;
+    return roomWithoutPassword as RoomWithCount;
 }
 
 export async function getUserRooms(): Promise<RoomWithCount[]> {
@@ -108,5 +126,9 @@ export async function getUserRooms(): Promise<RoomWithCount[]> {
         orderBy: { joinedAt: "desc" },
     });
 
-    return enrollments.map((enrollment: { room: RoomWithCount }) => enrollment.room);
+    return enrollments.map((enrollment) => {
+        const { password, ...roomWithoutPassword } = enrollment.room;
+        return roomWithoutPassword as RoomWithCount;
+    });
 }
+

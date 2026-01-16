@@ -12,11 +12,14 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { createRoom } from "@/actions/rooms";
 
 export function CreateRoomDialog() {
     const [open, setOpen] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const handleSubmit = (formData: FormData) => {
@@ -66,6 +69,24 @@ export function CreateRoomDialog() {
                                 required
                             />
                         </div>
+                        <div className="flex items-center space-x-2">
+                            <Switch id="isPrivate" name="isPrivate" onCheckedChange={setIsPrivate} />
+                            <Label htmlFor="isPrivate">Private Room</Label>
+                        </div>
+                        {isPrivate && (
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="text-sm font-medium">
+                                    Password
+                                </label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Enter room password"
+                                    required
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button

@@ -29,6 +29,9 @@ model Room {
   university String // e.g. "Aalto University"
   createdAt  DateTime @default(now())
 
+  isPrivate Boolean @default(false)
+  password  String? // Hashed password for private rooms
+
   members Enrollment[]
   posts   Post[]
 }
