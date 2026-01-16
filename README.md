@@ -1,4 +1,4 @@
-# StudentSync
+# StudyBuds
 
 ![StudentSync Banner](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
@@ -7,7 +7,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?style=for-the-badge&logo=postgresql)
 
-StudentSync is a modern social learning platform designed to help university students connect, share resources, and succeed together. It enables students to discover study groups, share files, and collaborate in real-time.
+StudyBuds is a modern social learning platform designed to help university students connect, share resources, and succeed together. It enables students to discover study groups, share files, and collaborate in real-time.
 
 🚀 **Live Demo:** [https://study-buds-zeta.vercel.app/](https://study-buds-zeta.vercel.app/)
 
